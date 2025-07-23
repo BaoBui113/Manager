@@ -22,6 +22,7 @@ import { JobPostsModule } from './job_posts/job_posts.module';
 import { JobApplicationsModule } from './job_applications/job_applications.module';
 import { AuditLogsModule } from './audit_logs/audit_logs.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -65,6 +66,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     JobApplicationsModule,
     AuditLogsModule,
     NotificationsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
