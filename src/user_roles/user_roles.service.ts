@@ -49,6 +49,10 @@ export class UserRolesService {
         user: { id: createUserRoleDto.userId },
         role: { id: createUserRoleDto.roleId },
       },
+      select: {
+        user: { id: true, email: true },
+        role: { id: true, name: true },
+      },
     });
     if (existingUserRole) {
       throw new BadRequestException('User already has this role assigned');
@@ -66,6 +70,16 @@ export class UserRolesService {
   async findAll(): Promise<UserRole[]> {
     return await this.userRoleRepository.find({
       relations: ['user', 'role'],
+      select: {
+        user: {
+          id: true,
+          email: true,
+        },
+        role: {
+          id: true,
+          name: true,
+        },
+      },
       order: { created_at: 'DESC' },
     });
   }

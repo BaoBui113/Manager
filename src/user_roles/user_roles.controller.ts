@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
+import { Public } from '../auth/constants';
 import { CreateUserRoleDto } from './dto/create-user_role.dto';
 import { UpdateUserRoleDto } from './dto/update-user_role.dto';
 import { UserRolesService } from './user_roles.service';
@@ -21,12 +22,14 @@ import { UserRolesService } from './user_roles.service';
 export class UserRolesController {
   constructor(private readonly userRolesService: UserRolesService) {}
 
+  @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserRoleDto: CreateUserRoleDto) {
     return await this.userRolesService.create(createUserRoleDto);
   }
 
+  @Public()
   @Get()
   async findAll() {
     return await this.userRolesService.findAll();
