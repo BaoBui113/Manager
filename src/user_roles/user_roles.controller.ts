@@ -1,45 +1,53 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { UserRolesService } from './user_roles.service';
+import { AuthGuard } from '../auth/auth.guard';
 import { CreateUserRoleDto } from './dto/create-user_role.dto';
 import { UpdateUserRoleDto } from './dto/update-user_role.dto';
+import { UserRolesService } from './user_roles.service';
 
 @Controller('user-roles')
+@UseGuards(AuthGuard)
 export class UserRolesController {
   constructor(private readonly userRolesService: UserRolesService) {}
 
   @Post()
-  create(@Body() createUserRoleDto: CreateUserRoleDto) {
-    return this.userRolesService.create(createUserRoleDto);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createUserRoleDto: CreateUserRoleDto) {
+    return await this.userRolesService.create(createUserRoleDto);
   }
 
   @Get()
-  findAll() {
-    return this.userRolesService.findAll();
+  async findAll() {
+    return await this.userRolesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userRolesService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.userRolesService.findOne(id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
+  async update(
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ) {
-    return this.userRolesService.update(+id, updateUserRoleDto);
+    return await this.userRolesService.update(id, updateUserRoleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userRolesService.remove(+id);
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.userRolesService.remove(id);
   }
 }

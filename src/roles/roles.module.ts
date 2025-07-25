@@ -5,8 +5,9 @@ import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Role])],
   controllers: [RolesController],
   providers: [RolesService],
-  imports: [TypeOrmModule.forFeature([Role])], // Add your Role entity here
+  exports: [RolesService], // Export service để các module khác có thể sử dụng
 })
 export class RolesModule {}

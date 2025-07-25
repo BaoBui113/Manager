@@ -1,26 +1,129 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
+import { Role } from '../roles/entities/role.entity';
 import { CreateUserRoleDto } from './dto/create-user_role.dto';
 import { UpdateUserRoleDto } from './dto/update-user_role.dto';
+import { UserRole } from './entities/user_role.entity';
 
 @Injectable()
 export class UserRolesService {
-  create(createUserRoleDto: CreateUserRoleDto) {
-    return 'This action adds a new userRole';
+  constructor(
+    @InjectRepository(UserRole)
+    private userRoleRepository: Repository<UserRole>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
+  ) {}
+
+  async create(createUserRoleDto: CreateUserRoleDto): Promise<UserRole> {
+    // Check if user exists
+    const user = await this.userRepository.findOne({
+      where: { id: createUserRoleDto.userId },
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${createUserRoleDto.userId} not found`,
+      );
+    }
+
+    // Check if role exists
+    const role = await this.roleRepository.findOne({
+      where: { id: createUserRoleDto.roleId },
+    });
+    if (!role) {
+      throw new NotFoundException(
+        `Role with ID ${createUserRoleDto.roleId} not found`,
+      );
+    }
+
+    // Check if user already has this role
+    const existingUserRole = await this.userRoleRepository.findOne({
+      where: {
+        user: { id: createUserRoleDto.userId },
+        role: { id: createUserRoleDto.roleId },
+      },
+    });
+    if (existingUserRole) {
+      throw new BadRequestException('User already has this role assigned');
+    }
+
+    const userRole = this.userRoleRepository.create({
+      user: user,
+      role: role,
+      scope: createUserRoleDto.scope || 'all',
+    });
+
+    return await this.userRoleRepository.save(userRole);
   }
 
-  findAll() {
-    return `This action returns all userRoles`;
+  async findAll(): Promise<UserRole[]> {
+    return await this.userRoleRepository.find({
+      relations: ['user', 'role'],
+      order: { created_at: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userRole`;
+  async findOne(id: number): Promise<UserRole> {
+    const userRole = await this.userRoleRepository.findOne({
+      where: { id },
+      relations: ['user', 'role'],
+    });
+
+    if (!userRole) {
+      throw new NotFoundException(`UserRole with ID ${id} not found`);
+    }
+
+    return userRole;
   }
 
-  update(id: number, updateUserRoleDto: UpdateUserRoleDto) {
-    return `This action updates a #${id} userRole`;
+  async update(
+    id: number,
+    updateUserRoleDto: UpdateUserRoleDto,
+  ): Promise<UserRole> {
+    const userRole = await this.findOne(id);
+
+    // If updating user or role, check if they exist
+    if (updateUserRoleDto.userId) {
+      const user = await this.userRepository.findOne({
+        where: { id: updateUserRoleDto.userId },
+      });
+      if (!user) {
+        throw new NotFoundException(
+          `User with ID ${updateUserRoleDto.userId} not found`,
+        );
+      }
+      userRole.user = user;
+    }
+
+    if (updateUserRoleDto.roleId) {
+      const role = await this.roleRepository.findOne({
+        where: { id: updateUserRoleDto.roleId },
+      });
+      if (!role) {
+        throw new NotFoundException(
+          `Role with ID ${updateUserRoleDto.roleId} not found`,
+        );
+      }
+      userRole.role = role;
+    }
+
+    if (updateUserRoleDto.scope !== undefined) {
+      userRole.scope = updateUserRoleDto.scope;
+    }
+
+    return await this.userRoleRepository.save(userRole);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} userRole`;
+  async remove(id: number): Promise<{ message: string }> {
+    const userRole = await this.findOne(id);
+    await this.userRoleRepository.remove(userRole);
+    return { message: `UserRole assignment has been removed successfully` };
   }
 }

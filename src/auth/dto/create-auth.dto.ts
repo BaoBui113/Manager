@@ -23,4 +23,8 @@ export class CreateAuthDto {
   @IsString()
   @IsNotEmpty()
   address: string;
+
+  @IsString()
+  @IsNotEmpty()
+  dob: string;
 }

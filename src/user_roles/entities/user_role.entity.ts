@@ -16,5 +16,5 @@ export class UserRole extends BaseEntity {
 
   @ManyToOne(() => User, user => user.userRoles)
   @JoinColumn({ name: 'user_id' })
-  user: UserRole;
+  user: User;
 }
