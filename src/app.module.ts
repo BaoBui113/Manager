@@ -1,33 +1,41 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
-import { EmployeesModule } from './employees/employees.module';
-import { DepartmentsModule } from './departments/departments.module';
-import { PositionsModule } from './positions/positions.module';
-import { TeamsModule } from './teams/teams.module';
-import { TeamMembersModule } from './team_members/team_members.module';
-import { RolesModule } from './roles/roles.module';
-import { PermissionsModule } from './permissions/permissions.module';
-import { RolePermissionsModule } from './role_permissions/role_permissions.module';
-import { UserRolesModule } from './user_roles/user_roles.module';
-import { ContractsModule } from './contracts/contracts.module';
-import { LeavesModule } from './leaves/leaves.module';
 import { AttendancesModule } from './attendances/attendances.module';
+import { AuditLogsModule } from './audit_logs/audit_logs.module';
+import { AuthModule } from './auth/auth.module';
+import { ContractsModule } from './contracts/contracts.module';
+import { DepartmentsModule } from './departments/departments.module';
+import { EmployeesModule } from './employees/employees.module';
+import { JobApplicationsModule } from './job_applications/job_applications.module';
+import { JobPostsModule } from './job_posts/job_posts.module';
+import { LeavesModule } from './leaves/leaves.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { PayrollsModule } from './payrolls/payrolls.module';
 import { PerformanceReviewsModule } from './performance_reviews/performance_reviews.module';
-import { JobPostsModule } from './job_posts/job_posts.module';
-import { JobApplicationsModule } from './job_applications/job_applications.module';
-import { AuditLogsModule } from './audit_logs/audit_logs.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { AuthModule } from './auth/auth.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { PositionsModule } from './positions/positions.module';
+import { RolePermissionsModule } from './role_permissions/role_permissions.module';
+import { RolesModule } from './roles/roles.module';
+import { TeamMembersModule } from './team_members/team_members.module';
+import { TeamsModule } from './teams/teams.module';
+import { UserModule } from './user/user.module';
+import { UserRolesModule } from './user_roles/user_roles.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

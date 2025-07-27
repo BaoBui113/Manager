@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  # Redis for BullMQ
+  redis:
+    image: redis:7-alpine
+    container_name: redis-bullmq
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - manager-network
+
+  # Redis Commander (GUI for Redis)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    depends_on:
+      - redis
+    ports:
+      - '8081:8081'
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    networks:
+      - manager-network
+
+volumes:
+  redis_data:
+
+networks:
+  manager-network:
+    driver: bridge

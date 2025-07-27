@@ -53,4 +53,10 @@ export class RolesController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.rolesService.remove(id);
   }
+
+  @Public()
+  @Post('seed')
+  seedRoles() {
+    return this.rolesService.seedRoles();
+  }
 }

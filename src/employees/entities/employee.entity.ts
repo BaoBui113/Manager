@@ -8,7 +8,15 @@ import { Position } from 'src/positions/entities/position.entity';
 import { BaseEntity } from 'src/shared/BaseEntity';
 import { TeamMember } from 'src/team_members/entities/team_member.entity';
 import { Team } from 'src/teams/entities/team.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
+import { User } from '../../entities/user.entity';
 @Entity('employees')
 export class Employee extends BaseEntity {
   @Column()
@@ -30,6 +38,16 @@ export class Employee extends BaseEntity {
     default: '',
   })
   avatar_url: string;
+
+  @Column({
+    name: 'base_salary',
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    default: 0,
+  })
+  base_salary: number;
+
   // Many-to-One: Nhân viên thuộc về một phòng ban
   @ManyToOne(() => Department, department => department.employees, {
     nullable: true,
@@ -83,4 +101,7 @@ export class Employee extends BaseEntity {
     performanceReview => performanceReview.reviews,
   )
   reviews: PerformanceReview[];
+
+  @OneToOne(() => User, user => user.employee)
+  user: User;
 }

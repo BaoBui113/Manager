@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { Public } from '../auth/constants';
 import { CreateRolePermissionDto } from './dto/create-role_permission.dto';
 import { UpdateRolePermissionDto } from './dto/update-role_permission.dto';
 import { RolePermissionsService } from './role_permissions.service';
@@ -44,7 +45,11 @@ export class RolePermissionsController {
   remove(@Param('id') id: string) {
     return this.rolePermissionsService.remove(+id);
   }
-
+  @Public()
+  @Get('role/:roleName')
+  getRolePermissions(@Param('roleName') roleName: string) {
+    return this.rolePermissionsService.getRolePermissions(roleName);
+  }
   // Helper endpoints
   @Get('role/:roleId')
   findByRoleId(@Param('roleId') roleId: string) {
@@ -54,5 +59,11 @@ export class RolePermissionsController {
   @Get('permission/:permissionId')
   findByPermissionId(@Param('permissionId') permissionId: string) {
     return this.rolePermissionsService.findByPermissionId(+permissionId);
+  }
+
+  @Public()
+  @Post('seed')
+  seedRolePermissions() {
+    return this.rolePermissionsService.seedRolePermissions();
   }
 }

@@ -3,7 +3,8 @@ import { JobPost } from 'src/job_posts/entities/job_post.entity';
 import { Notification } from 'src/notifications/entities/notification.entity';
 import { BaseEntity } from 'src/shared/BaseEntity';
 import { UserRole } from 'src/user_roles/entities/user_role.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Employee } from '../employees/entities/employee.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -15,6 +16,13 @@ export class User extends BaseEntity {
 
   @Column({ default: true })
   is_active: boolean;
+
+  @OneToOne(() => Employee, employee => employee.user, { cascade: true })
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
+
+  @Column({ nullable: true })
+  employee_id: number;
 
   @OneToMany(() => UserRole, userRole => userRole.user)
   userRoles: UserRole[];
